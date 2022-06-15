@@ -1,7 +1,10 @@
 package br.com.digisystem.controllers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.digisystem.dtos.ProfessorDTO;
 import br.com.digisystem.entities.ProfessorEntity;
+import br.com.digisystem.services.CsvExportService;
 import br.com.digisystem.services.ProfessorService;
 
 @RestController
@@ -24,6 +28,9 @@ public class ProfessorController {
 
 	@Autowired
 	private ProfessorService profService;
+	
+	@Autowired
+	private CsvExportService csvExportService;
 	
 	@GetMapping
 	public ResponseEntity<List<ProfessorDTO>> getAll(){
@@ -72,5 +79,13 @@ public class ProfessorController {
 		
 		return ResponseEntity.ok().build();
 	}
+	
+	
+	@RequestMapping("/export")
+    public void getAllProfsInCsv(HttpServletResponse servletResponse) throws IOException {
+        servletResponse.setHeader("Content-Type", "text/csv; charset=UTF-16LE");
+        servletResponse.addHeader("Content-Disposition","attachment; filename=\"professores.csv\"");
+        csvExportService.writeEmployeesToCsv(servletResponse.getWriter());
+    }
 	
 }

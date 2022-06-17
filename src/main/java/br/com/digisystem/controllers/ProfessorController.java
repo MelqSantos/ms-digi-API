@@ -1,7 +1,9 @@
 package br.com.digisystem.controllers;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -57,6 +59,18 @@ public class ProfessorController {
 		return ResponseEntity.ok().body(this.profService.getOne(id).toDTO());
 	}
 	
+	@GetMapping("/export")
+    public ResponseEntity<Void> getAllProfsInCsv(HttpServletResponse servletResponse) throws IOException {
+		String timeStamp = new SimpleDateFormat("dd-MM-yyyy")
+				.format(Calendar.getInstance().getTime());
+
+        servletResponse.setHeader("Content-Type", "text/csv;charset=UTF-8");
+        servletResponse.addHeader("Content-Disposition","attachment; filename=\"profs_" + timeStamp +".csv\"");
+        csvExportService.writeProfessoresToCsv(servletResponse.getWriter());
+        
+        return ResponseEntity.ok().build();
+    }
+	
 	@PostMapping
 	public ResponseEntity<ProfessorDTO> create(@RequestBody ProfessorDTO prof) {
 		
@@ -79,13 +93,4 @@ public class ProfessorController {
 		
 		return ResponseEntity.ok().build();
 	}
-	
-	
-	@RequestMapping("/export")
-    public void getAllProfsInCsv(HttpServletResponse servletResponse) throws IOException {
-        servletResponse.setHeader("Content-Type", "text/csv; charset=UTF-16LE");
-        servletResponse.addHeader("Content-Disposition","attachment; filename=\"professores.csv\"");
-        csvExportService.writeEmployeesToCsv(servletResponse.getWriter());
-    }
-	
 }
